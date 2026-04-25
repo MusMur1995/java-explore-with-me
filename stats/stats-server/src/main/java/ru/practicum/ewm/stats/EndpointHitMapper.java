@@ -1,7 +1,9 @@
 package ru.practicum.ewm.stats;
 
+import org.springframework.stereotype.Component;
 import ru.practicum.ewm.stats.dto.EndpointHitDto;
 
+@Component
 public class EndpointHitMapper {
 
     public EndpointHitDto toDto(EndpointHit endpointHitEntity) {

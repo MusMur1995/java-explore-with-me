@@ -23,16 +23,16 @@ public class StatsController {
         return service.saveHit(endpointHitDto);
     }
 
-    @GetMapping
+    @GetMapping("/stats")
     @ResponseStatus(HttpStatus.OK)
     public List<ViewStatsDto> getStats(
-            @RequestBody @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
             LocalDateTime start,
-            @RequestBody @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
             LocalDateTime end,
             @RequestParam(required = false)
             List<String> uris,
-            @RequestParam(required = false)
+            @RequestParam(required = false, defaultValue = "false")
             Boolean unique
     ) {
         return service.getStats(start, end, uris, unique);
