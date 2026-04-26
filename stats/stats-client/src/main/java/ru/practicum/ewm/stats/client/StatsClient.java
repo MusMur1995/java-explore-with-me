@@ -34,11 +34,11 @@ public class StatsClient {
 
     public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         if (start == null || end == null) {
-            throw new IllegalArgumentException("Задайте даты начала и окончания");
+            throw new IllegalArgumentException("Даты начала и окончания должны быть заданы");
         }
 
         if (end.isBefore(start)) {
-            throw new IllegalArgumentException("Дата старта должна быть раньше даты окончания");
+            throw new IllegalArgumentException("Даты окончания должна быть позже даты начала");
         }
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder
@@ -55,9 +55,8 @@ public class StatsClient {
         }
 
         return restClient.get()
-                .uri(uriComponentsBuilder.build().toUri())
+                .uri(uriComponentsBuilder.build().toUriString())
                 .retrieve()
-                .body(new ParameterizedTypeReference<List<ViewStatsDto>>() {
-                });
+                .body(new ParameterizedTypeReference<List<ViewStatsDto>>() {});
     }
 }
