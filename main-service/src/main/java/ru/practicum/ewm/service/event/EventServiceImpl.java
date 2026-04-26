@@ -157,35 +157,14 @@ public class EventServiceImpl implements EventService {
         return fullDto;
     }
 
-//    @Override
-//    public EventFullDto getPublicEventById(Long eventId, HttpServletRequest request) {
-//        logHit(request);
-//
-//        Event event = eventRepository.findByIdAndState(eventId, EventState.PUBLISHED)
-//                .orElseThrow(() -> new NotFoundException("Мероприятие не найдено"));
-//
-//        Map<Long, Long> views = getViews(List.of(event));
-//
-//        EventFullDto fullDto = mapper.toFullDto(event, views.getOrDefault(eventId, 0L));
-//        fullDto.setConfirmedRequests(getConfirmedRequests(eventId));
-//
-//        return fullDto;
-//    }
-
     @Override
     public EventFullDto getPublicEventById(Long eventId, HttpServletRequest request) {
-        log.info("=== 1. getPublicEventById called for event {} ===", eventId);
-
         logHit(request);
 
         Event event = eventRepository.findByIdAndState(eventId, EventState.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Мероприятие не найдено"));
 
-        log.info("=== 2. Event found, state: {} ===", event.getState());
-
-        log.info("=== 3. Calling getViews... ===");
         Map<Long, Long> views = getViews(List.of(event));
-        log.info("=== 4. Views result: {} ===", views);
 
         EventFullDto fullDto = mapper.toFullDto(event, views.getOrDefault(eventId, 0L));
         fullDto.setConfirmedRequests(getConfirmedRequests(eventId));
@@ -440,56 +419,14 @@ public class EventServiceImpl implements EventService {
         statsClient.saveHit(hit);
     }
 
-//    private Map<Long, Long> getViews(List<Event> events) {
-//        if (events.isEmpty()) {
-//            return Map.of();
-//        }
-//
-//        List<String> uris = events.stream()
-//                .map(event -> "/events/" + event.getId())
-//                .toList();
-//
-//        LocalDateTime start = events.stream()
-//                .map(event -> {
-//                    if (event.getPublishedOn() != null) {
-//                        return event.getPublishedOn();
-//                    } else if (event.getState() == EventState.PUBLISHED) {
-//                        return event.getCreatedOn();
-//                    } else {
-//                        return LocalDateTime.now();
-//                    }
-//                })
-//                .min(LocalDateTime::compareTo)
-//                .orElse(LocalDateTime.now());
-//
-//        try {
-//            List<ViewStatsDto> stats = statsClient.getStats(start, LocalDateTime.now(), uris, true);
-//
-//            return stats.stream()
-//                    .collect(Collectors.toMap(
-//                            stat -> Long.parseLong(stat.getUri().substring("/events/".length())),
-//                            ViewStatsDto::getHits
-//                    ));
-//        } catch (Exception e) {
-//            log.warn("Ошибка при получении статистики просмотров", e);
-//            return Collections.emptyMap();
-//        }
-//    }
-
     private Map<Long, Long> getViews(List<Event> events) {
-        log.info("=== GETVIEWS: METHOD START ===");
-        log.info("=== GETVIEWS: events size = {} ===", events.size());
-
         if (events.isEmpty()) {
-            log.info("=== GETVIEWS: events is empty, returning empty map ===");
             return Map.of();
         }
 
         List<String> uris = events.stream()
                 .map(event -> "/events/" + event.getId())
                 .toList();
-
-        log.info("=== GETVIEWS: uris = {} ===", uris);
 
         LocalDateTime start = events.stream()
                 .map(event -> {
@@ -504,23 +441,16 @@ public class EventServiceImpl implements EventService {
                 .min(LocalDateTime::compareTo)
                 .orElse(LocalDateTime.now());
 
-        log.info("=== GETVIEWS: start date = {} ===", start);
-        log.info("=== GETVIEWS: end date = {} ===", LocalDateTime.now());
-
         try {
-            log.info("=== GETVIEWS: CALLING statsClient.getStats ===");
             List<ViewStatsDto> stats = statsClient.getStats(start, LocalDateTime.now(), uris, true);
-            log.info("=== GETVIEWS: stats response = {} ===", stats);
 
-            Map<Long, Long> result = stats.stream()
+            return stats.stream()
                     .collect(Collectors.toMap(
                             stat -> Long.parseLong(stat.getUri().substring("/events/".length())),
                             ViewStatsDto::getHits
                     ));
-            log.info("=== GETVIEWS: result map = {} ===", result);
-            return result;
         } catch (Exception e) {
-            log.error("=== GETVIEWS: EXCEPTION ===", e);
+            log.warn("Ошибка при получении статистики просмотров", e);
             return Collections.emptyMap();
         }
     }
