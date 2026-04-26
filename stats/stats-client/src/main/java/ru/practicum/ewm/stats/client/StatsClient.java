@@ -1,5 +1,7 @@
 package ru.practicum.ewm.stats.client;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
@@ -13,6 +15,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class StatsClient {
+
+    private static final Logger log = LoggerFactory.getLogger(StatsClient.class);
+
     private final RestClient restClient;
 
     public StatsClient(RestClient restClient) {
@@ -26,9 +31,9 @@ public class StatsClient {
                     .retrieve()
                     .toBodilessEntity();
         } catch (ResourceAccessException e) {
-            //log.warn("Сервис статистики недоступен: {}", e.getMessage());
+            log.warn("Сервис статистики недоступен: {}", e.getMessage());
         } catch (RestClientException e) {
-            //log.error("Ошибка при отправке статистики: {}", e.getMessage());
+            log.error("Ошибка при отправке статистики: {}", e.getMessage());
         }
     }
 
@@ -57,6 +62,7 @@ public class StatsClient {
         return restClient.get()
                 .uri(uriComponentsBuilder.build().toUriString())
                 .retrieve()
-                .body(new ParameterizedTypeReference<List<ViewStatsDto>>() {});
+                .body(new ParameterizedTypeReference<List<ViewStatsDto>>() {
+                });
     }
 }
