@@ -10,6 +10,8 @@ import ru.practicum.ewm.dto.EventFullDto;
 import ru.practicum.ewm.dto.EventPublicSearchParams;
 import ru.practicum.ewm.dto.EventShortDto;
 import ru.practicum.ewm.service.EventService;
+import ru.practicum.ewm.stats.client.StatsClient;
+import ru.practicum.ewm.stats.dto.EndpointHitDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.List;
 @Slf4j
 public class PublicEventController {
     private final EventService service;
+    private final StatsClient statsClient;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -38,6 +41,19 @@ public class PublicEventController {
         log.info("GET /events called: text={}, categories={}, paid={}, rangeStart={}, " +
                         "rangeEnd={}, onlyAvailable={}, sort={}, from={}, size={}",
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+
+
+        try {
+            statsClient.saveHit(new EndpointHitDto(
+                    null,
+                    "main-service",
+                    request.getRequestURI(),
+                    request.getRemoteAddr(),
+                    LocalDateTime.now()
+            ));
+        } catch (Exception e) {
+            log.warn("Failed to send hit to stats-server: {}", e.getMessage());
+        }
 
         List<EventShortDto> result = service.getPublicEvents(new EventPublicSearchParams(
                 text,
@@ -61,6 +77,20 @@ public class PublicEventController {
             @PathVariable long id,
             HttpServletRequest request
     ) {
+
+        try {
+            statsClient.saveHit(new EndpointHitDto(
+                    null,
+                    "main-service",
+                    request.getRequestURI(),
+                    request.getRemoteAddr(),
+                    LocalDateTime.now()
+            ));
+            log.info("Hit sent for event id: {}", id);
+        } catch (Exception e) {
+            log.warn("Failed to send hit for event {}: {}", id, e.getMessage());
+        }
+
         return service.getPublicEventById(id, request);
     }
 }
