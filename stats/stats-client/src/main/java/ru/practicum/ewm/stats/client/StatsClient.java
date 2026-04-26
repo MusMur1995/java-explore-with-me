@@ -1,7 +1,9 @@
 package ru.practicum.ewm.stats.client;
 
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.ewm.stats.dto.EndpointHitDto;
 import ru.practicum.ewm.stats.dto.ViewStatsDto;
@@ -18,10 +20,16 @@ public class StatsClient {
     }
 
     public void saveHit(EndpointHitDto endpointHitDto) {
-        restClient.post().uri("/hit")
-                .body(endpointHitDto)
-                .retrieve()
-                .toBodilessEntity();
+        try {
+            restClient.post().uri("/hit")
+                    .body(endpointHitDto)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (ResourceAccessException e) {
+            //log.warn("Сервис статистики недоступен: {}", e.getMessage());
+        } catch (RestClientException e) {
+            //log.error("Ошибка при отправке статистики: {}", e.getMessage());
+        }
     }
 
     public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
