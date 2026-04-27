@@ -6,7 +6,6 @@ import ru.practicum.ewm.dto.category.CategoryDto;
 import ru.practicum.ewm.model.Category;
 
 @Mapper(componentModel = "spring")
-@Component
 public interface CategoryMapper {
 
     CategoryDto toDto(Category category);

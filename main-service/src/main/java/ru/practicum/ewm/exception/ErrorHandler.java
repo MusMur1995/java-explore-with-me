@@ -112,10 +112,9 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // ошибка 500
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiError handleThrowable(final Throwable e) {
-        e.printStackTrace();
-        log.error("Ошибка: {}", e.getMessage());
+        log.error("Непредвиденная ошибка: {}", e.getMessage());
         return ApiError.builder()
                 .message("Произошла непредвиденная ошибка")
                 .reason("Пожалуйста, попробуйте позже")

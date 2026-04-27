@@ -14,12 +14,12 @@ import ru.practicum.ewm.model.event.Event;
 public interface EventMapper {
 
     @Mapping(target = "views", source = "views")
-    @Mapping(target = "confirmedRequests", ignore = true)
-    EventFullDto toFullDto(Event event, long views);
+    @Mapping(target = "confirmedRequests", source = "confirmedRequests")
+    EventFullDto toFullDto(Event event, long views, long confirmedRequests);
 
     @Mapping(target = "views", source = "views")
-    @Mapping(target = "confirmedRequests", ignore = true)
-    EventShortDto toShortDto(Event event, long views);
+    @Mapping(target = "confirmedRequests", source = "confirmedRequests")
+    EventShortDto toShortDto(Event event, long views, long confirmedRequests);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "initiator", ignore = true)
