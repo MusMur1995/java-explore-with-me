@@ -1,11 +1,14 @@
 package ru.practicum.ewm.service.category;
 
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.ewm.dto.category.CategoryDto;
 import ru.practicum.ewm.dto.category.NewCategoryDto;
 import ru.practicum.ewm.exception.ConflictException;
@@ -67,8 +70,10 @@ public class CategoryServiceImpl implements CategoryService {
         return mapper.toDto(categoryRepository.save(category));
     }
 
-    @Override
-    public List<CategoryDto> getAll(int from, int size) {
+    public List<CategoryDto> getAll(
+            @PositiveOrZero(message = "from должен быть >= 0") @RequestParam(defaultValue = "0") int from,
+            @Positive(message = "size должен быть > 0") @RequestParam(defaultValue = "10") int size
+    ) {
         Pageable pageable = PageRequest.of(
                 from / size,
                 size,
