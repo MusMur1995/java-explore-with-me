@@ -144,7 +144,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\"annotation\":\"Тестовое событие для комментариев\",\n\"category\":{{catId}},\n\"description\":\"Описание тестового события для проверки комментариев\",\n\"eventDate\":\"2025-12-31 20:00:00\",\n\"location\":{\"lat\":55.7558,\"lon\":37.6176},\n\"paid\":false,\n\"participantLimit\":100,\n\"requestModeration\":false,\n\"title\":\"Тестовое событие\"}",
+          "raw": "{\"annotation\":\"Тестовое событие для комментариев\",\n\"category\":{{catId}},\n\"description\":\"Описание тестового события для проверки комментариев\",\n\"eventDate\":\"2027-12-31 20:00:00\",\n\"location\":{\"lat\":55.7558,\"lon\":37.6176},\n\"paid\":false,\n\"participantLimit\":100,\n\"requestModeration\":false,\n\"title\":\"Тестовое событие\"}",
           "options": {
             "raw": {
               "language": "json"
@@ -444,7 +444,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\"annotation\":\"Неопубликованное событие\",\n\"category\":{{catId}},\n\"description\":\"Событие в состоянии PENDING\",\n\"eventDate\":\"2025-12-31 21:00:00\",\n\"location\":{\"lat\":55.7558,\"lon\":37.6176},\n\"paid\":false,\n\"participantLimit\":50,\n\"requestModeration\":false,\n\"title\":\"Неопубликованное событие\"}",
+          "raw": "{\"annotation\":\"Неопубликованное событие\",\n\"category\":{{catId}},\n\"description\":\"Событие в состоянии PENDING\",\n\"eventDate\":\"2027-12-31 21:00:00\",\n\"location\":{\"lat\":55.7558,\"lon\":37.6176},\n\"paid\":false,\n\"participantLimit\":50,\n\"requestModeration\":false,\n\"title\":\"Неопубликованное событие\"}",
           "options": {
             "raw": {
               "language": "json"
