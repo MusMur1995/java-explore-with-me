@@ -102,6 +102,30 @@ CREATE TABLE IF NOT EXISTS requests
     created TIMESTAMP WITHOUT TIME ZONE NOT NULL
     );
 
+CREATE TABLE IF NOT EXISTS comments
+(
+    id
+    BIGSERIAL
+    PRIMARY
+    KEY,
+    text
+    VARCHAR
+(
+    2000
+) NOT NULL,
+    created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    author_id BIGINT NOT NULL REFERENCES users
+(
+    id
+)
+                      ON DELETE CASCADE,
+    event_id BIGINT NOT NULL REFERENCES events
+(
+    id
+)
+                      ON DELETE CASCADE
+    );
+
 CREATE TABLE IF NOT EXISTS compilations
 (
     id
