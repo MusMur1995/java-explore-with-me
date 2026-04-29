@@ -34,4 +34,19 @@ public class Comment {
 
     @Column(name = "created", nullable = false)
     private LocalDateTime created;
+
+    @Column(name = "updated")
+    private LocalDateTime updated;
+
+    @Column(name = "moderated")
+    private Boolean moderated;
+
+    @Column(name = "approved")
+    private Boolean approved;
+
+    @Column(name = "moderated_at")
+    private LocalDateTime moderatedAt;
+
+    @Column(name = "moderation_reason", length = 500)
+    private String moderationReason;
 }

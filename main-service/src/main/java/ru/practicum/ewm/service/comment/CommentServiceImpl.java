@@ -1,12 +1,16 @@
 package ru.practicum.ewm.service.comment;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.comment.CommentDto;
 import ru.practicum.ewm.dto.comment.NewCommentDto;
 import ru.practicum.ewm.exception.ConflictException;
+import ru.practicum.ewm.exception.ForbiddenException;
 import ru.practicum.ewm.exception.NotFoundException;
+import ru.practicum.ewm.exception.ValidationException;
 import ru.practicum.ewm.mapper.CommentMapper;
 import ru.practicum.ewm.model.Comment;
 import ru.practicum.ewm.model.User;
@@ -44,23 +48,72 @@ public class CommentServiceImpl implements CommentService {
         comment.setAuthor(author);
         comment.setEvent(event);
         comment.setCreated(LocalDateTime.now());
+        comment.setModerated(false);
+        comment.setApproved(true);
 
         return mapper.toDto(commentRepository.save(comment));
     }
 
     @Override
     @Transactional
-    public void delete(Long commentId) {
+    public CommentDto update(Long eventId, Long userId, Long commentId, NewCommentDto dto) {
+        Comment comment = findCommentById(commentId);
+
+        if (!comment.getAuthor().getId().equals(userId)) {
+            throw new ForbiddenException("Только автор может редактировать комментарий");
+        }
+
+        if (comment.getModerated() != null && comment.getModerated() && !comment.getApproved()) {
+            throw new ConflictException("Невозможно редактировать отклоненный комментарий");
+        }
+
+        comment.setText(dto.getText());
+        comment.setUpdated(LocalDateTime.now());
+
+        return mapper.toDto(commentRepository.save(comment));
+    }
+
+    @Override
+    @Transactional
+    public void deleteByAdmin(Long eventId, Long commentId) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new NotFoundException("Комментарий с таким id не найден"));
+                .orElseThrow(() -> new NotFoundException("Комментарий не найден"));
+
+        if (!comment.getEvent().getId().equals(eventId)) {
+            throw new ConflictException("Комментарий не принадлежит указанному событию");
+        }
+
         commentRepository.delete(comment);
     }
 
     @Override
-    public List<CommentDto> getAll(Long eventId) {
-        findEventById(eventId); // проверяем существует ли мероприятие
+    @Transactional
+    public void deleteByUser(Long eventId, Long userId, Long commentId) {
+        Comment comment = findCommentById(commentId);
 
-        return commentRepository.findByEventId(eventId).stream()
+        if (!comment.getAuthor().getId().equals(userId)) {
+            throw new ForbiddenException("Только автор может удалить комментарий");
+        }
+
+        commentRepository.delete(comment);
+    }
+
+    @Override
+    public List<CommentDto> getAll(Long eventId, int from, int size) {
+
+        if (size <= 0) {
+            size = 10;
+        }
+        if (from < 0) {
+            from = 0;
+        }
+
+        findEventById(eventId);
+
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size);
+
+        return commentRepository.findByEventIdAndApprovedTrue(eventId, pageable).stream()
                 .map(mapper::toDto)
                 .toList();
     }
@@ -73,5 +126,36 @@ public class CommentServiceImpl implements CommentService {
     private Event findEventById(Long eventId) {
         return eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Событие с таким id не найдено"));
+    }
+
+    @Override
+    @Transactional
+    public CommentDto moderate(Long eventId, Long commentId, String action) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException("Комментарий не найден"));
+
+        if (!comment.getEvent().getId().equals(eventId)) {
+            throw new ConflictException("Комментарий не принадлежит указанному событию");
+        }
+
+        if ("APPROVE".equals(action)) {
+            comment.setModerated(true);
+            comment.setApproved(true);
+            comment.setModeratedAt(LocalDateTime.now());
+        } else if ("REJECT".equals(action)) {
+            comment.setModerated(true);
+            comment.setApproved(false);
+            comment.setModeratedAt(LocalDateTime.now());
+            comment.setModerationReason("Отклонено модератором");
+        } else {
+            throw new ValidationException("Некорректное действие модерации");
+        }
+
+        return mapper.toDto(commentRepository.save(comment));
+    }
+
+    private Comment findCommentById(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException("Комментарий не найден"));
     }
 }

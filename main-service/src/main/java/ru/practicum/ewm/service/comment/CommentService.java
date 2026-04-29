@@ -9,7 +9,13 @@ public interface CommentService {
 
     CommentDto create(Long eventId, Long userId, NewCommentDto dto);
 
-    void delete(Long commentId);
+    CommentDto update(Long eventId, Long userId, Long commentId, NewCommentDto dto);
 
-    List<CommentDto> getAll(Long eventId);
+    void deleteByAdmin(Long eventId, Long commentId);
+
+    void deleteByUser(Long eventId, Long userId, Long commentId);
+
+    List<CommentDto> getAll(Long eventId, int from, int size);
+
+    CommentDto moderate(Long eventId, Long commentId, String action);
 }

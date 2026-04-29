@@ -16,7 +16,11 @@ public class PublicCommentController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<CommentDto> getAll(@PathVariable Long eventId) {
-        return service.getAll(eventId);
+    public List<CommentDto> getAll(
+            @PathVariable Long eventId,
+            @RequestParam(defaultValue = "0") int from,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return service.getAll(eventId, from, size);
     }
 }

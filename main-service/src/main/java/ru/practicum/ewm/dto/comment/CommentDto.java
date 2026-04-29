@@ -17,4 +17,9 @@ public class CommentDto {
     private UserShortDto author;
     private EventShortDto event;
     private LocalDateTime created;
+    private LocalDateTime updated;
+    private Boolean moderated;
+    private Boolean approved;
+    private LocalDateTime moderatedAt;
+    private String moderationReason;
 }
