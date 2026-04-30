@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS compilation_events;
+DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS compilations;
 DROP TABLE IF EXISTS requests;
 DROP TABLE IF EXISTS events;
@@ -63,7 +64,6 @@ CREATE TABLE IF NOT EXISTS events
     id
 ),
     event_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
---    confirmed_requests INTEGER,
     lat FLOAT,
     lon FLOAT,
     paid BOOLEAN DEFAULT FALSE,
@@ -73,7 +73,6 @@ CREATE TABLE IF NOT EXISTS events
 (
     50
 ) NOT NULL,
---    views              INTEGER DEFAULT 0,
     created_on TIMESTAMP
                          WITHOUT TIME ZONE NOT NULL,
     published_on TIMESTAMP
@@ -100,6 +99,40 @@ CREATE TABLE IF NOT EXISTS requests
     50
 ) NOT NULL,
     created TIMESTAMP WITHOUT TIME ZONE NOT NULL
+    );
+
+CREATE TABLE IF NOT EXISTS comments
+(
+    id
+    BIGSERIAL
+    PRIMARY
+    KEY,
+    text
+    VARCHAR
+(
+    2000
+) NOT NULL,
+    created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated TIMESTAMP
+                      WITHOUT TIME ZONE,
+    author_id BIGINT NOT NULL REFERENCES users
+(
+    id
+)
+                      ON DELETE CASCADE,
+    event_id BIGINT NOT NULL REFERENCES events
+(
+    id
+)
+                      ON DELETE CASCADE,
+    moderated BOOLEAN DEFAULT FALSE,
+    approved BOOLEAN,
+    moderated_at TIMESTAMP
+                      WITHOUT TIME ZONE,
+    moderation_reason VARCHAR
+(
+    500
+)
     );
 
 CREATE TABLE IF NOT EXISTS compilations
